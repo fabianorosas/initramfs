@@ -1,3 +1,6 @@
 [submodule "external/busybox"]
 	path = external/busybox
 	url = git://busybox.net/busybox.git
+[submodule "external/trace-cmd"]
+	path = external/trace-cmd
+	url = git://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
