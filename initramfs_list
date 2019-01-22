@@ -11,4 +11,5 @@ dir /proc 755 0 0
 dir /sys 755 0 0
 slink /bin/sh busybox 777 0 0
 file /bin/busybox busybox 755 0 0
+file /bin/trace-cmd trace-cmd 755 0 0
 file /init init.sh 755 0 0
