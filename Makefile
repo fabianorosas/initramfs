@@ -8,10 +8,12 @@ BUSYBOX_DIR=$(EXT_DIR)/busybox
 all: initramfs.img
 
 busybox: $(BUSYBOX_DIR)/Makefile
-	git submodule update $(BUSYBOX_DIR)
 	make -C $(BUSYBOX_DIR) defconfig
 	make -C $(BUSYBOX_DIR) LDFLAGS=$(LDFLAGS_BUSYBOX)
 	mv $(BUSYBOX_DIR)/busybox .
+
+$(BUSYBOX_DIR)/Makefile:
+	git submodule update --init $(BUSYBOX_DIR)
 
 gen_init_cpio: $(EXT_DIR)/gen_init_cpio.c
 	$(CC) -o $@ $(EXT_DIR)/gen_init_cpio.c
