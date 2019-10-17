@@ -9,7 +9,10 @@ dir /usr/bin 755 1000 1000
 dir /usr/sbin 755 1000 1000
 dir /proc 755 0 0
 dir /sys 755 0 0
+dir /mnt 755 0 0
+dir /etc 755 0 0
 slink /bin/sh busybox 777 0 0
+file /etc/fstab fstab 755 0 0
 file /bin/busybox busybox 755 0 0
 file /bin/trace-cmd trace-cmd 755 0 0
 file /init init.sh 755 0 0

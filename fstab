@@ -1,0 +1,1 @@
+myfs /mnt virtiofs rootmode=040000,user_id=0,group_id=0,noauto 0 0
