@@ -4,3 +4,9 @@
 [submodule "external/trace-cmd"]
 	path = external/trace-cmd
 	url = git://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
+[submodule "external/librtas"]
+	path = external/librtas
+	url = https://github.com/ibm-power-utilities/librtas
+[submodule "external/powerpc-utils"]
+	path = external/powerpc-utils
+	url = https://github.com/ibm-power-utilities/powerpc-utils

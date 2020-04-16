@@ -1,45 +1,44 @@
-CC		= gcc
-LDFLAGS_BUSYBOX  = --static
-LDFLAGS_TRACE_CMD = -static
-
 EXT_DIR=external
-BUSYBOX_DIR=$(EXT_DIR)/busybox
-TRACE_CMD_DIR=$(EXT_DIR)/trace-cmd
 
 .PHONY: all
 all: initramfs.img
 
-busybox: $(BUSYBOX_DIR)/Makefile
-	make -C $(BUSYBOX_DIR) defconfig
-	make -C $(BUSYBOX_DIR) LDFLAGS=$(LDFLAGS_BUSYBOX)
-	mv $(BUSYBOX_DIR)/busybox .
+BINS=trace-cmd lsprop drmgr
 
-$(BUSYBOX_DIR)/Makefile:
-	git submodule update --init $(BUSYBOX_DIR)
+# make them all at once so that we can use -j in the cmdline
+bins:
+	+make -C $(EXT_DIR) $(BINS)
 
-trace-cmd: $(TRACE_CMD_DIR)/Makefile
-	make -C $(TRACE_CMD_DIR) LDFLAGS=$(LDFLAGS_TRACE_CMD)
-	mv $(TRACE_CMD_DIR)/tracecmd/trace-cmd .
+$(BINS) busybox:
+	+make -C $(EXT_DIR) $@
 
-$(TRACE_CMD_DIR)/Makefile:
-	git submodule update --init $(TRACE_CMD_DIR)
+prog_list: busybox init.sh
+	$(file >$@) \
+	$(foreach prog,$(BINS) $^, \
+		$(file >>$@,file /bin/$(prog) $(prog) 755 0 0))
 
-gen_init_cpio: $(EXT_DIR)/gen_init_cpio.c
-	$(CC) -o $@ $(EXT_DIR)/gen_init_cpio.c
+rootfs_contents: default_contents bins prog_list
+	$(file >>$@,$(file <default_contents)$(file <prog_list))
+	rm prog_list
 
-initramfs_list: busybox trace-cmd init.sh
+gen_init_cpio: $(EXT_DIR)/gen_init_cpio
 
-.PHONY: initramfs.img
-initramfs.img: gen_init_cpio initramfs_list
-	./gen_init_cpio initramfs_list | gzip > initramfs.img
+initramfs.img: gen_init_cpio rootfs_contents
+	$(EXT_DIR)/gen_init_cpio rootfs_contents | gzip > initramfs.img
 
-.PHONY: clean
 clean:
-	rm -f gen_init_cpio
-	rm -f initramfs.img
-	make -C $(TRACE_CMD_DIR) clean
+	-rm initramfs.img
+	-rm rootfs_contents
+	-rm prog_list
+	+make -C $(EXT_DIR) clean
 
-.PHONY: distclean
 distclean: clean
-	rm -f busybox trace-cmd
-	make -C $(BUSYBOX_DIR) distclean
+	-rm busybox
+	-rm $(BINS)
+	+make -C $(EXT_DIR) distclean
+
+.PHONY: bins
+.PHONY: initramfs.img
+.PHONY: clean
+.PHONY: distclean
+FORCE:
